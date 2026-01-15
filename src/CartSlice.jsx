@@ -5,6 +5,7 @@ export const CartSlice = createSlice({
   initialState: {
     items: [], // Initialize items as an empty array
   },
+  
   reducers: {
     addItem: (state, action) => {
     
