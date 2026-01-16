@@ -297,7 +297,7 @@ function ProductList({ onHomeClick }) {
                     {plantsArray.map((category, index) => ( // --- Loop through each category in plantsArray ---
                         <div key={index}>   {/* Unique key for each div category */}
                             <h1>
-                                <div>{category.category}</div>  {/* Category Name */}
+                                <div className='plant_heading'>{category.category}</div>  {/* Category Name */}
                             </h1>
 
                             <div className='product-list'>  {/* Container for list of plant cards */}

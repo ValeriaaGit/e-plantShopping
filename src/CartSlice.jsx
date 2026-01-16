@@ -19,8 +19,9 @@ export const CartSlice = createSlice({
         state.items.push({name, image, cost, quantity: 1});
       }
     },
-    removeItem: (state, action) => {
+    removeItem: (state, action) => { // keep all the items (plants) that do not match the info (payload) that is curently being passed
       state.items = state.items.filter(item => item.name !== action.payload);
+      // .filter() creates a new array containing only the elements that pass a specific "test" (a condition)
     },
     updateQuantity: (state, action) => {
       // Destructure the product name and new quantity from the action payload
@@ -32,9 +33,12 @@ export const CartSlice = createSlice({
         itemToUpdate.quantity = quantity; // if the item is found, update its quantity to the new value
       }
     },
+    clearCart: (state) => { // clears the cart after checkout 
+      state.cart = [];
+    },
   },
 });
 
-export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
+export const { addItem, removeItem, updateQuantity, clearCart } = CartSlice.actions;
 
 export default CartSlice.reducer;
