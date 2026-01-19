@@ -1,16 +1,20 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { removeItem, updateQuantity, clearCart } from './CartSlice';
 import './CartItem.css';
 
+// This page contains the code for the CartItem and the checkout page overall
+
+// The CartItem component contains all the info and functionality needed inside a checkout-item card 
 const CartItem = ({ onContinueShopping }) => {
   // ----- States -----
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+  const cartItems = useSelector(state => state.cart?.items || []);
 
-  // Calculate total amount for all products in the cart
-  const calculateTotalAmount = () => {
-    console.log("Inside calculate total amount");
+  // ----- Functions -----
+  
+  const calculateTotalAmount = () => { // Calculate total amount for all products in the cart
     let total = 0;
 
     cart.forEach(item => {
@@ -18,6 +22,32 @@ const CartItem = ({ onContinueShopping }) => {
 
       total += price * item.quantity;
     });
+
+    return total;
+  };
+
+  const handleIncrement = (item) => {
+    dispatch(updateQuantity({name: item.name, quantity: item.quantity + 1}));
+  };
+
+  const handleDecrement = (item) => {
+   if (item.quantity > 1) {
+    dispatch(updateQuantity({name: item.name, quantity: item.quantity - 1}));
+   } else if (item.quantity === 0) {
+    handleRemove(item.name);
+   }
+  };
+
+  const handleRemove = (plantName) => {
+    dispatch(removeItem(plantName));
+  };
+
+  // Calculate total cost based on quantity for an item
+  const calculateTotalCost = (item) => {
+
+    let total = 0;
+    const price = parseFloat(item.cost.substring(1));
+    total += price * item.quantity;
 
     return total;
   };
@@ -31,13 +61,18 @@ const CartItem = ({ onContinueShopping }) => {
     if (e) e.preventDefault();
 
     // Check if the cart is empty before proceeding
-    if (cart.lenght === 0) {
+    if (cartItems.length === 0) {
       alert("Your cart is empty!");
       return;
     }
 
     // Calculate final totals
     const totalAmount = calculateTotalAmount();
+
+    // Show confirmation
+    const confirmed = window.confirm(
+      `Total: $${totalAmount.toFixed(2)}\nProceed with checkout?`
+    );
 
     // Create an order object for the database or API
     const orderDetail = {
@@ -48,38 +83,10 @@ const CartItem = ({ onContinueShopping }) => {
 
     console.log("Order Processed: ", orderDetail);
 
-    // Cleanup: clear the Redux cart and local UI state
-    dispatch(clearCart()); // create this action in redux
-    setAddedToCart({}); // reset local 'Added' buttons
-
-
-  };
-
-  const handleIncrement = (item) => {
-    dispatch(updateQuantity({name: item.name, quantity: item.quantity + 1}));
-  };
-
-  const handleDecrement = (item) => {
-   if (item.quantity >= 1) {
-    dispatch(updateQuantity({name: item.name, quantity: item.quantity - 1}));
-   } else {
-    handleRemove(item);
-   }
-  };
-
-  const handleRemove = (item) => {
-    dispatch(removeItem(item));
-  };
-
-  // Calculate total cost based on quantity for an item
-  const calculateTotalCost = (item) => {
-    console.log("Inside calculate total cost");
-
-    let total = 0;
-    const price = parseFloat(item.cost.substring(1));
-    total += price * item.quantity;
-
-    return total;
+    if (confirmed) {
+      dispatch(clearCart()); // create this action in redux
+      alert('Thank you for your purchase!');
+    }
   };
 
   return (
@@ -101,7 +108,7 @@ const CartItem = ({ onContinueShopping }) => {
               </div>
               
               <div className="cart-item-total">Total: ${calculateTotalCost(item)}</div>
-              <button className="cart-item-delete" onClick={() => handleRemove(item)}>Delete</button>
+              <button className="cart-item-delete" onClick={() => handleRemove(item.name)}>Delete</button>
             </div>
           
           </div>

@@ -34,7 +34,7 @@ export const CartSlice = createSlice({
       }
     },
     clearCart: (state) => { // clears the cart after checkout 
-      state.cart = [];
+      state.items = [];
     },
   },
 });
