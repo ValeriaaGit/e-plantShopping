@@ -12,6 +12,7 @@ function ProductList({ onHomeClick }) {
     const [addedToCart, setAddedToCart] = useState({});
     const dispatch = useDispatch();
     const cartCount = useSelector(state => state.cart?.items?.length || 0); // cart item count
+    const cartItems = useSelector(state => state.cart?.items || []);
 
     const plantsArray = [
         {
@@ -266,6 +267,7 @@ function ProductList({ onHomeClick }) {
     };
 
     const handleAddToCart = product => {
+       
         dispatch(addItem(product)); // dispatch action to add the product to the cart (redux action)
         setAddedToCart((prevState) => ({ // update the local state to reflect that the product has been added
             ...prevState, // spread the previous state to retain existing entries
@@ -316,8 +318,8 @@ function ProductList({ onHomeClick }) {
                     </div>
                 </div>
             </div>
-            {!showCart ? (
-                <div className="product-grid">
+            {!showCart ? ( // ---------- Plant item list ----------
+                <div className="product-grid"> 
                     {plantsArray.map((category, index) => ( // --- Loop through each category in plantsArray ---
                         <div key={index}>   {/* Unique key for each div category */}
                             <h1>
@@ -326,6 +328,7 @@ function ProductList({ onHomeClick }) {
 
                             <div className='product-list'>  {/* Container for list of plant cards */}
                                 {category.plants.map((plant, plantIndex) => (   // --- Loop through each plant in the current category ---
+                                    
                                     <div className='product-card' key={plantIndex}> {/* Unique key for each plant card */}
                                         <img
                                             className='product-image'
@@ -342,8 +345,21 @@ function ProductList({ onHomeClick }) {
                                         <button
                                             className='product-button'
                                             onClick={() => handleAddToCart(plant)}
+                                            disabled={cartItems.some(item => item.name === plant.name)}
+                                            style={{
+                                                backgroundColor: cartItems.some(item => item.name === plant.name)  
+                                                ? '#ccc' 
+                                                : '#4CAF50',
+                                                color: cartItems.some(item => item.name === plant.name) 
+                                                ? '#666' 
+                                                : 'white',
+                                                cursor: cartItems.some(item => item.name === plant.name) 
+                                                ? 'not-allowed' 
+                                                : 'pointer'
+
+                                            }}
                                         >
-                                            Add to Cart
+                                            {cartItems.some(item => item.name === plant.name) ? '✓ Added' : 'Add to Cart'}
                                         </button>
                                     </div>
                                 ))}
